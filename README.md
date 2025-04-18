@@ -1,70 +1,145 @@
-# Getting Started with Create React App
+# Car Showroom Web Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack web application where users can list their cars for sale and browse vehicles posted by others. Built with React for the frontend and Node.js/Express for the backend, with MongoDB as the database.
 
-## Available Scripts
+![Car Showroom](src/assets/TG_DSC0155.jpg)
 
-In the project directory, you can run:
+## Features
 
-### `npm start`
+- **User Authentication**: Sign up, login, and session management
+- **Car Listings**: Users can post their vehicle information and images
+- **My Inventory**: Manage your own car listings
+- **Favorites**: Save and browse cars you're interested in
+- **Responsive Design**: Works on mobile, tablet and desktop devices
+- **Real-time Server Status**: Automatic detection of server connection issues
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Tech Stack
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Frontend
 
-### `npm test`
+- React 19
+- React Router v7
+- React Bootstrap
+- Context API for state management
+- Bootstrap 5 for styling
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Backend
 
-### `npm run build`
+- Node.js
+- Express
+- MongoDB
+- Express-Session for authentication
+- Bcrypt for password encryption
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Getting Started
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Follow these instructions to get the project up and running on your local machine.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Prerequisites
 
-### `npm run eject`
+- Node.js (v16 or higher)
+- npm or yarn
+- MongoDB (local or Atlas)
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Installation
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+#### Clone the repository
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```bash
+git clone <repository-url>
+cd car-showroom
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+#### Backend Setup
 
-## Learn More
+1. Navigate to the backend directory:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+cd backend
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+2. Install dependencies:
 
-### Code Splitting
+```bash
+npm install
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+3. Create a `.env` file with the following variables:
 
-### Analyzing the Bundle Size
+```
+PORT=5000
+MONGO_URI=mongodb://localhost:27017/car-showroom
+SESSION_SECRET=your_secret_key_here
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+4. Start the backend server:
 
-### Making a Progressive Web App
+```bash
+npm start
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+The server will run on http://localhost:5000
 
-### Advanced Configuration
+#### Frontend Setup
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+1. Navigate back to the root directory:
 
-### Deployment
+```bash
+cd ..
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+2. Install dependencies:
 
-### `npm run build` fails to minify
+```bash
+npm install
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+3. Start the frontend development server:
+
+```bash
+npm start
+```
+
+The application will open in your browser at http://localhost:3000
+
+## Project Structure
+
+```
+├── backend/                  # Backend Node.js/Express server
+│   ├── controllers/          # Request controllers
+│   ├── middleware/           # Express middleware
+│   ├── models/               # MongoDB models
+│   ├── routes/               # API routes
+│   └── server.js             # Entry point
+└── src/                      # Frontend React application
+    ├── assets/               # Images and static assets
+    ├── components/           # Reusable React components
+    ├── contexts/             # React context for state management
+    ├── pages/                # Page components
+    └── styles/               # CSS and style files
+```
+
+## Usage
+
+1. Register a new account or log in with existing credentials
+2. Browse car listings on the main page
+3. Add cars to your favorites by clicking on the heart icon
+4. Manage your car inventory through "My Inventory" page
+5. Add new car listings with details and images
+
+## Authentication Flow
+
+- The application uses session-based authentication
+- When the server is restarted, users are automatically logged out for security
+- The navbar displays the username when logged in and login/signup options when logged out
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+- Car images and data used for demonstration purposes only
+- Bootstrap Icons for the UI elements
+- Create React App for the initial project setup
+
