@@ -47,7 +47,7 @@ Follow these instructions to get the project up and running on your local machin
 
 ```bash
 git clone https://github.com/Harshavardhan-28/FSWD_Exp10.git
-cd car-showroom
+cd FSWD_Exp10
 ```
 
 #### Backend Setup
