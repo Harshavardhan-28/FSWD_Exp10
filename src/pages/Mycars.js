@@ -1,80 +1,131 @@
-import React, { useState } from 'react';
-import { Button, Form, Modal, Container, Row, Col } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Button, Form, Modal, Container, Row, Col, Alert } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import BasicExample from '../components/Card';
 import '../styles/RecipePages.css';
-import { useFavorites } from '../contexts/FavoritesContext';
+import { useAuth } from '../contexts/AuthContext';
 
 function Mycars() {
-  // Initial cars data
-  const initialCars = [
-    { 
-      id: 1, 
-      title: 'Honda Civic', 
-      description: 'Reliable compact sedan with excellent fuel economy.',
-      image: 'https://images.unsplash.com/photo-1590362891991-f776e747a588?auto=format&fit=crop&w=500&q=60',
-      specs: ['1.5L Turbo Engine', '180 Horsepower', 'CVT Transmission', 'Cloth Seats', 'Apple CarPlay Integration', 'Honda Sensing Suite'],
-      details: 'The Honda Civic is a compact car known for its reliability, fuel efficiency, and practicality. It offers a comfortable ride, responsive handling, and a spacious interior for its class. The Civic comes with a range of modern features and has excellent resale value.'
-    },
-    { 
-      id: 2, 
-      title: 'Ford Mustang', 
-      description: 'Iconic American muscle car with powerful engine options.',
-      image: 'https://images.unsplash.com/photo-1611016186353-9af58c69a533?auto=format&fit=crop&w=500&q=60',
-      specs: ['5.0L V8 Engine', '460 Horsepower', '6-Speed Manual', 'Leather Seats', 'SYNC 3 Infotainment', 'Active Valve Performance Exhaust'],
-      details: 'The Ford Mustang is a legendary American muscle car that combines powerful performance with iconic styling. It features a driver-focused cockpit with modern technology and comfortable seating. The Mustang offers thrilling acceleration and a distinctive engine note from its V8 engine.'
-    },
-    { 
-      id: 3, 
-      title: 'Jeep Wrangler', 
-      description: 'Rugged off-road SUV with removable top and doors.',
-      image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=500&q=60',
-      specs: ['3.6L V6 Engine', '285 Horsepower', '8-Speed Automatic', 'Water Resistant Interior', '4x4 System', 'Removable Top and Doors'],
-      details: 'The Jeep Wrangler is an iconic off-road vehicle known for its exceptional capability in rough terrain. It features a unique design with removable doors and roof for an open-air experience. The Wrangler combines rugged utility with modern comfort features for both daily driving and weekend adventures.'
-    },
-    { 
-      id: 4, 
-      title: 'Lexus ES', 
-      description: 'Luxury sedan with smooth ride and elegant interior.',
-      image: 'https://images.unsplash.com/photo-1583870908951-71149f42bcf9?auto=format&fit=crop&w=500&q=60',
-      specs: ['3.5L V6 Engine', '302 Horsepower', '8-Speed Automatic', 'Semi-Aniline Leather', 'Mark Levinson Audio', 'Lexus Safety System+'],
-      details: 'The Lexus ES is a luxury midsize sedan that offers a refined driving experience with a focus on comfort. It features a whisper-quiet cabin with premium materials and excellent build quality. The ES provides a smooth ride, efficient performance, and a comprehensive suite of safety features.'
-    }
-  ];
-
   // States
-  const [cars, setCars] = useState(initialCars);
+  const [cars, setCars] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
-  const [currentCar, setCurrentCar] = useState({ id: null, title: '', description: '', image: '', specs: [], details: '' });
+  const [currentCar, setCurrentCar] = useState({ 
+    title: '', 
+    description: '', 
+    image: '', 
+    specs: [], 
+    details: '',
+    price: 0
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [formError, setFormError] = useState('');
+  const [formSuccess, setFormSuccess] = useState('');
+  
+  // Get authentication context
+  const { user } = useAuth();
 
-  // Use favorites context
-  const { isFavorite, addToFavorites, removeFromFavorites } = useFavorites();
+  // Fetch user's cars from API on component mount
+  useEffect(() => {
+    // Only fetch cars if user is logged in
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    
+    const fetchUserCars = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/cars/user-cars', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include' // Important to include cookies for authentication
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch cars');
+        }
+
+        const data = await response.json();
+        setCars(data);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchUserCars();
+  }, [user]);
 
   // Form handling
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setCurrentCar({ ...currentCar, [name]: value });
+    
+    if (name === 'price') {
+      // Convert price to number
+      setCurrentCar({ ...currentCar, [name]: parseFloat(value) || 0 });
+    } else {
+      setCurrentCar({ ...currentCar, [name]: value });
+    }
   };
 
   // CRUD Operations
   // Create
-  const handleAddCar = () => {
-    const newCar = {
-      ...currentCar,
-      id: cars.length > 0 ? Math.max(...cars.map(c => c.id)) + 1 : 1,
-      specs: currentCar.specs || []
-    };
-    
-    setCars([...cars, newCar]);
-    setCurrentCar({ id: null, title: '', description: '', image: '', specs: [], details: '' });
-    setShowAddModal(false);
+  const handleAddCar = async () => {
+    try {
+      setFormError('');
+      setFormSuccess('');
+
+      // Validate form data
+      if (!currentCar.title || !currentCar.description || !currentCar.image || !currentCar.price) {
+        setFormError('Please fill in all required fields');
+        return;
+      }
+      
+      // Prepare car data
+      const carData = {
+        ...currentCar,
+        specs: Array.isArray(currentCar.specs) ? currentCar.specs : currentCar.specs.split('\n')
+      };
+
+      // Send POST request to create car
+      const response = await fetch('/api/cars', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(carData),
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to add car');
+      }
+
+      const newCar = await response.json();
+      
+      // Update cars state with new car
+      setCars([...cars, newCar]);
+      
+      // Reset form and close modal
+      setCurrentCar({ title: '', description: '', image: '', specs: [], details: '', price: 0 });
+      setShowAddModal(false);
+      setFormSuccess('Car added successfully!');
+    } catch (err) {
+      setFormError(err.message);
+    }
   };
 
   // Read - already implemented with the mapping in the JSX
   const handleViewCar = (id) => {
-    const car = cars.find(car => car.id === id);
+    const car = cars.find(car => car._id === id);
     if (car) {
       setCurrentCar(car);
       setShowViewModal(true);
@@ -87,11 +138,48 @@ function Mycars() {
     setShowEditModal(true);
   };
 
-  const handleUpdateCar = () => {
-    setCars(cars.map(car => 
-      car.id === currentCar.id ? currentCar : car
-    ));
-    setShowEditModal(false);
+  const handleUpdateCar = async () => {
+    try {
+      setFormError('');
+      
+      // Validate form data
+      if (!currentCar.title || !currentCar.description || !currentCar.image || !currentCar.price) {
+        setFormError('Please fill in all required fields');
+        return;
+      }
+      
+      // Prepare car data
+      const carData = {
+        ...currentCar,
+        specs: Array.isArray(currentCar.specs) ? currentCar.specs : currentCar.specs.split('\n')
+      };
+
+      // Send PUT request to update car
+      const response = await fetch(`/api/cars/${currentCar._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(carData),
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update car');
+      }
+
+      const updatedCar = await response.json();
+      
+      // Update cars state with updated car
+      setCars(cars.map(car => car._id === updatedCar._id ? updatedCar : car));
+      
+      // Close modal
+      setShowEditModal(false);
+      setFormSuccess('Car updated successfully!');
+    } catch (err) {
+      setFormError(err.message);
+    }
   };
 
   // Delete
@@ -100,9 +188,28 @@ function Mycars() {
     setShowDeleteModal(true);
   };
 
-  const handleDeleteCar = () => {
-    setCars(cars.filter(car => car.id !== currentCar.id));
-    setShowDeleteModal(false);
+  const handleDeleteCar = async () => {
+    try {
+      // Send DELETE request
+      const response = await fetch(`/api/cars/${currentCar._id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete car');
+      }
+
+      // Update cars state by removing the deleted car
+      setCars(cars.filter(car => car._id !== currentCar._id));
+      
+      // Close modal
+      setShowDeleteModal(false);
+      setFormSuccess('Car deleted successfully!');
+    } catch (err) {
+      setFormError(err.message);
+    }
   };
 
   // Helper to format specs as a list if it's an array
@@ -119,21 +226,23 @@ function Mycars() {
     return <p>{specs}</p>;
   };
 
-  // Handle favorite toggle in modal
-  const handleToggleFavorite = () => {
-    if (isFavorite(currentCar.id)) {
-      removeFromFavorites(currentCar.id);
-    } else {
-      addToFavorites({
-        id: currentCar.id,
-        title: currentCar.title,
-        description: currentCar.description,
-        image: currentCar.image,
-        specs: currentCar.specs,
-        details: currentCar.details
-      });
-    }
-  };
+  // If user is not logged in, show login message
+  if (!user) {
+    return (
+      <Container className="text-center p-5">
+        <div className="my-5">
+          <h2>Please Log In</h2>
+          <p className="mb-4">You need to be logged in to view and manage your car inventory.</p>
+          <Button as={Link} to="/login" variant="primary" size="lg">
+            Go to Login
+          </Button>
+        </div>
+      </Container>
+    );
+  }
+
+  if (loading) return <div className="text-center p-5"><h3>Loading your car inventory...</h3></div>;
+  if (error) return <Alert variant="danger" className="m-3">Error: {error}</Alert>;
 
   return (
     <Container className="car-container">
@@ -142,7 +251,7 @@ function Mycars() {
         <Button 
           variant="success" 
           onClick={() => {
-            setCurrentCar({ id: null, title: '', description: '', image: '', specs: [], details: '' });
+            setCurrentCar({ title: '', description: '', image: '', specs: [], details: '', price: 0 });
             setShowAddModal(true);
           }}
         >
@@ -150,30 +259,40 @@ function Mycars() {
         </Button>
       </div>
 
-      <div className="car-grid">
-        {cars.map(car => (
-          <div key={car.id} className="car-card">
-            <div className="car-card-wrapper">
-              <BasicExample 
-                id={car.id}
-                title={car.title} 
-                description={car.description} 
-                image={car.image}
-                specs={car.specs}
-                onViewCar={handleViewCar}
-              />
-              <div className="car-actions">
-                <Button variant="info" size="sm" onClick={() => handleEditClick(car)}>
-                  <i className="bi bi-pencil-fill me-1"></i> Edit
-                </Button>
-                <Button variant="danger" size="sm" onClick={() => handleDeleteClick(car)}>
-                  <i className="bi bi-trash-fill me-1"></i> Delete
-                </Button>
+      {formSuccess && <Alert variant="success" className="mt-3" dismissible onClose={() => setFormSuccess('')}>{formSuccess}</Alert>}
+
+      {cars.length === 0 ? (
+        <div className="text-center p-5">
+          <h3>You don't have any cars in your inventory yet.</h3>
+          <p>Click the "Add New Car" button to get started!</p>
+        </div>
+      ) : (
+        <div className="car-grid">
+          {cars.map(car => (
+            <div key={car._id} className="car-card">
+              <div className="car-card-wrapper">
+                <div className="price-badge">${car.price}</div>
+                <BasicExample 
+                  id={car._id}
+                  title={car.title} 
+                  description={car.description} 
+                  image={car.image}
+                  specs={car.specs}
+                  onViewCar={handleViewCar}
+                />
+                <div className="car-actions">
+                  <Button variant="info" size="sm" onClick={() => handleEditClick(car)}>
+                    <i className="bi bi-pencil-fill me-1"></i> Edit
+                  </Button>
+                  <Button variant="danger" size="sm" onClick={() => handleDeleteClick(car)}>
+                    <i className="bi bi-trash-fill me-1"></i> Delete
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Add Car Modal */}
       <Modal show={showAddModal} onHide={() => setShowAddModal(false)} centered>
@@ -181,6 +300,7 @@ function Mycars() {
           <Modal.Title>Add New Car</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          {formError && <Alert variant="danger">{formError}</Alert>}
           <Form>
             <Form.Group className="mb-3">
               <Form.Label>Title</Form.Label>
@@ -206,6 +326,17 @@ function Mycars() {
               />
             </Form.Group>
             <Form.Group className="mb-3">
+              <Form.Label>Price (in USD)</Form.Label>
+              <Form.Control 
+                type="number" 
+                name="price"
+                value={currentCar.price} 
+                onChange={handleInputChange} 
+                placeholder="Car price" 
+                required 
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
               <Form.Label>Image URL</Form.Label>
               <Form.Control 
                 type="text" 
@@ -213,6 +344,7 @@ function Mycars() {
                 value={currentCar.image} 
                 onChange={handleInputChange} 
                 placeholder="https://example.com/image.jpg" 
+                required
               />
               <Form.Text className="text-muted">
                 Enter a URL for the car image
@@ -254,6 +386,7 @@ function Mycars() {
           <Modal.Title>Edit Car</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          {formError && <Alert variant="danger">{formError}</Alert>}
           <Form>
             <Form.Group className="mb-3">
               <Form.Label>Title</Form.Label>
@@ -279,6 +412,17 @@ function Mycars() {
               />
             </Form.Group>
             <Form.Group className="mb-3">
+              <Form.Label>Price (in USD)</Form.Label>
+              <Form.Control 
+                type="number" 
+                name="price"
+                value={currentCar.price} 
+                onChange={handleInputChange} 
+                placeholder="Car price" 
+                required 
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
               <Form.Label>Image URL</Form.Label>
               <Form.Control 
                 type="text" 
@@ -286,6 +430,7 @@ function Mycars() {
                 value={currentCar.image} 
                 onChange={handleInputChange} 
                 placeholder="https://example.com/image.jpg" 
+                required
               />
               <Form.Text className="text-muted">
                 Enter a URL for the car image
@@ -338,7 +483,12 @@ function Mycars() {
       {/* View Car Modal */}
       <Modal show={showViewModal} onHide={() => setShowViewModal(false)} size="lg" centered>
         <Modal.Header closeButton>
-          <Modal.Title>{currentCar.title}</Modal.Title>
+          <Modal.Title>
+            {currentCar.title}
+            {currentCar.price && (
+              <span className="ms-2 badge bg-primary">${currentCar.price}</span>
+            )}
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div className="car-view">
@@ -370,14 +520,6 @@ function Mycars() {
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button 
-            variant={isFavorite(currentCar.id) ? "danger" : "outline-danger"} 
-            className="me-auto"
-            onClick={handleToggleFavorite}
-          >
-            <i className={`bi ${isFavorite(currentCar.id) ? "bi-heart-fill" : "bi-heart"} me-2`}></i>
-            {isFavorite(currentCar.id) ? "Remove from Favorites" : "Add to Favorites"}
-          </Button>
           <Button variant="secondary" onClick={() => setShowViewModal(false)}>Close</Button>
         </Modal.Footer>
       </Modal>

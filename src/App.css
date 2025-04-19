@@ -44,7 +44,7 @@
 .main-content {
   flex: 1 0 auto;
   margin-top: 76px; /* Adjust based on navbar height */
-  padding-bottom: 2rem;
+  padding-bottom: 0; /* Remove bottom padding */
 }
 
 /* Home page styling */
@@ -130,6 +130,7 @@
   color: white;
   padding: 4rem 0;
   margin-top: 2rem;
+  margin-bottom: 0; /* Ensure no bottom margin */
 }
 
 .cta-section h2 {

@@ -81,7 +81,7 @@ function Signup() {
             <Card.Body className="p-5">
               <div className="text-center mb-4">
                 <h2 className="fw-bold">Create Account</h2>
-                <p className="text-muted">Join the Car Showroom community</p>
+                <p className="text-muted">Join the Harshowroom community</p>
               </div>
 
               {error && <Alert variant="danger">{error}</Alert>}

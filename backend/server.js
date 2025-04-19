@@ -26,7 +26,7 @@ app.use(session({
 
 // Routes
 app.use('/api/auth', authRoutes);
-// app.use('/api/recipes', require('./routes/recipeRoutes'));
+app.use('/api/cars', require('./routes/carRoutes'));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {

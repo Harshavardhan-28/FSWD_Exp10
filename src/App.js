@@ -6,7 +6,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Cars from './pages/Cars';
 import Mycars from './pages/Mycars';
-import Favorites from './pages/Favorites';
+// import Favorites from './pages/Favorites';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import { FavoritesProvider } from './contexts/FavoritesContext';
@@ -25,7 +25,7 @@ const RouterWrapper = () => {
             <Route path="/" element={<Home />} />
             <Route path="/cars" element={<Cars />} />
             <Route path="/mycars" element={<Mycars />} />
-            <Route path="/favorites" element={<Favorites />} />
+            {/* <Route path="/favorites" element={<Favorites />} /> */}
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
           </Routes>

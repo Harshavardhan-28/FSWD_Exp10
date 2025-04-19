@@ -41,7 +41,7 @@ function NavigationBar() {
       <Container className="navbar-container">
         <Navbar.Brand as={Link} to="/" className="navbar-brand">
           <i className="bi bi-car-front me-2"></i>
-          Car Showroom
+          Harshowroom
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
@@ -67,13 +67,13 @@ function NavigationBar() {
             >
               <i className="bi bi-collection me-1"></i> My Inventory
             </Nav.Link>
-            <Nav.Link 
+            {/* <Nav.Link 
               as={Link} 
               to="/favorites" 
               className={`navbar-link ${location.pathname === '/favorites' ? 'active' : ''}`}
             >
               <i className="bi bi-heart me-1"></i> Favorites
-            </Nav.Link>
+            </Nav.Link> */}
             
             {user ? (
               <NavDropdown 

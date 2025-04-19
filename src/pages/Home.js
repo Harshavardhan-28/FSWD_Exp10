@@ -3,9 +3,23 @@ import Carousel from '../components/Carousel';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
+// Add custom styles to fix the spacing issue
+const styles = {
+  homePage: {
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: 'calc(100vh - 56px - 60px)', // Adjust based on navbar and footer height
+  },
+  ctaSection: {
+    padding: '40px 0',
+    marginTop: 'auto', // This pushes the CTA section to the bottom
+    marginBottom: 0, // Ensure no margin at the bottom
+  }
+};
+
 function Home() {
   return (
-    <div className="home-page">
+    <div className="home-page" style={styles.homePage}>
       <div className="hero-section">
         <Carousel />
         <div className="hero-overlay">
@@ -52,7 +66,7 @@ function Home() {
         </Row>
       </Container>
       
-      <div className="cta-section">
+      <div className="cta-section" style={styles.ctaSection}>
         <Container>
           <Row className="align-items-center">
             <Col md={7}>

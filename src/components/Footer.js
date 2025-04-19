@@ -9,7 +9,7 @@ function Footer() {
       <Container>
         <Row className="footer-content">
           <Col lg={4} md={6} className="footer-section">
-            <h4 className="footer-heading">Car Showroom</h4>
+            <h4 className="footer-heading">Harshowroom</h4>
             <p className="footer-description">
               Your ultimate destination for discovering and showcasing premium vehicles from around the world.
             </p>
@@ -58,7 +58,7 @@ function Footer() {
               </li>
               <li>
                 <i className="bi bi-telephone-fill"></i>
-                <span>(123) 456-7890</span>
+                <span>+91 7021372998</span>
               </li>
               <li>
                 <i className="bi bi-envelope-fill"></i>
@@ -69,7 +69,7 @@ function Footer() {
         </Row>
 
         <div className="footer-bottom">
-          <p>&copy; {new Date().getFullYear()} Car Showroom. All Rights Reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Harshowroom. All Rights Reserved.</p>
           <div className="footer-bottom-links">
             <a href="#">Privacy</a>
             <span className="separator">|</span>
