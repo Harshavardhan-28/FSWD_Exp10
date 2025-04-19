@@ -58,7 +58,7 @@ function Footer() {
               </li>
               <li>
                 <i className="bi bi-telephone-fill"></i>
-                <span>+91 7021372998</span>
+                <span>+91 99999 99999</span>
               </li>
               <li>
                 <i className="bi bi-envelope-fill"></i>
